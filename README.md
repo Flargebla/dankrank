@@ -12,3 +12,16 @@ DankRank requires a file named `creds.json` to specify various connection creden
 | `username` | The username of the Reddit account |
 | `user_agent` | The unique description of the application |
 | `password` | The password of the Reddit account |
+
+### Example
+```
+{
+    "reddit":{
+        "client_id"     :   "abcdefg",
+        "client_secret" :   "thisisasecret",
+        "user_agent"    :   "MyApp",
+        "username"      :   "reddituser123",
+        "password"      :   "password123"
+    }
+}
+```
