@@ -1,4 +1,4 @@
-import praw, requests, datetime, json, logging, threading, urllib.parse
+import praw, os, requests, datetime, json, logging, threading, urllib.parse
 from Dank import Dank
 from io import open as iopen
 from multiprocessing.pool import ThreadPool
@@ -9,7 +9,7 @@ class DankSucc:
     # reddit - The Reddit API Instance for accessing Reddit data
     # subreddits - The subtreddits that will be pulled from
     # danks - The list of Danks that were succ'd
-    # dps - The Danks per subreddit to succ
+    # dps - The Dos, anks per subreddit to succ
     def __init__(self, subreddit_string):
         logging.basicConfig(level=logging.INFO,
                             format="%(asctime)s %(levelname)s %(message)s",
@@ -55,11 +55,21 @@ class DankSucc:
         for d in self.danks:
             img_req = requests.get(d.url)
             if img_req.status_code == requests.codes.ok:
-                with iopen("danks/"+d.filename, 'wb') as f:
-                    f.write(img_req.content)
+                try:
+                    with iopen("danks/"+d.filename, 'wb') as f:
+                        f.write(img_req.content)
+                except PermissionError:
+                    self.logger.info("PermissionError: Failed to write")
+                    self.kill_dank(d)
             else:
                 self.logger.info("Failed to grab image from: "+d.url)
         self.logger.info("Persisting complete")
+
+    # Remove a dank from both the list and disk
+    def kill_dank(self, dank):
+        self.logger.info("Killing a dank: "+dank.url)
+        self.danks.remove(dank)
+        os.remove("danks/"+dank.filename)
 
     # Calculate post scores
     def calculate_scores(self):
