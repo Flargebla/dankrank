@@ -29,4 +29,8 @@ class Dank:
 
     # Determine the filetype
     def __detect_filetype(self):
-        return self.filename.split(".")[-1].upper()
+        ext = self.filename.split(".")[-1].upper()
+        if ext == "JPG":
+            self.extension = "JPEG"
+        else:
+            self.extension = ext
