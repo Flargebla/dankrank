@@ -1,7 +1,8 @@
-import praw, requests, datetime, json, time, logging, threading, urllib.parse
+import praw, requests, datetime, json, logging, threading, urllib.parse
 from Dank import Dank
 from io import open as iopen
 from multiprocessing.pool import ThreadPool
+from time import sleep
 
 class DankSucc:
 
@@ -30,14 +31,14 @@ class DankSucc:
             self.logger.info("Pulling from: r/"+sr)
             danks = self.reddit.subreddit(sr).search(query="",time_filter="day")
             for dank in danks:
-                time = datetime.datetime.fromtimestamp(dank.created)
+                time_made = datetime.datetime.fromtimestamp(dank.created)
                 earliest_time = datetime.datetime.now() - datetime.timedelta(hours=4)
-                if time < earliest_time:
-                    while threading.active_count() > 20:
+                if time_made < earliest_time:
+                    while threading.active_count() > 15:
                         self.logger.info("ThreadPool is full... waiting")
-                        time.sleep(0.5)
+                        sleep(0.5)
                     self.logger.info("Processing a post: <"+dank.url+", "+str(dank.ups)+">")
-                    t = threading.Thread(target=self.__grab_dank, args=(dank,sr,))
+                    t = threading.Thread(target=self.__grab_dank, args=(dank,sr,time_made))
                     threads.append(t)
                     t.start()
                 else:
@@ -46,6 +47,7 @@ class DankSucc:
         for thread in threads:
             thread.join()
         self.logger.info("Succing complete")
+        self.calculate_scores()
 
     # Save all the pulled Danks to disk
     def persist(self):
@@ -59,9 +61,17 @@ class DankSucc:
                 self.logger.info("Failed to grab image from: "+d.url)
         self.logger.info("Persisting complete")
 
+    # Calculate post scores
+    def calculate_scores(self):
+        max_score = max([d.score for d in self.danks])
+        min_score = min([d.score for d in self.danks])
+        scale = 100 / (max_score-min_score)
+        for d in self.danks:
+            d.score = d.score * scale
+
     # Create a Dank and pull the image
-    def __grab_dank(self, dank, sr):
-        d = Dank(dank.url, dank.ups, self.reddit.subreddit(sr))
+    def __grab_dank(self, dank, sr, time_posted):
+        d = Dank(dank.url, dank.ups, self.reddit.subreddit(sr), time_posted)
         self.danks.append(d)
 
     # Return the list of currently held Danks
