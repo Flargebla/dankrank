@@ -1,6 +1,7 @@
-import praw, requests, json, logging, urllib.parse
+import praw, requests, json, time, logging, threading, urllib.parse
 from Dank import Dank
 from io import open as iopen
+from multiprocessing.pool import ThreadPool
 
 class DankSucc:
 
@@ -24,16 +25,20 @@ class DankSucc:
     # Pull all images and upvote data from Reddit
     def succ(self):
         self.logger.info("Starting the succ()")
+        threads = []
         for sr in self.subreddits:
             self.logger.info("Pulling from: r/"+sr)
             danks = self.reddit.subreddit(sr).search(query="",time_filter="hour")
             for dank in danks:
+                while threading.active_count() > 20:
+                    self.logger.info("ThreadPool is full... waiting")
+                    time.sleep(0.5)
                 self.logger.info("Processing a post: <"+dank.url+", "+str(dank.ups)+">")
-                if self.__is_valid_dank(dank):
-                    d = Dank(dank.url, dank.ups, self.reddit.subreddit(sr))
-                    self.danks.append(d)
-                else:
-                    self.logger.info(dank.url+" was deemed invalid")
+                t = threading.Thread(target=self.__grab_dank, args=(dank,sr,))
+                threads.append(t)
+                t.start()
+        for thread in threads:
+            thread.join()
 
     # Save all the pulled Danks to disk
     def persist(self):
@@ -43,6 +48,11 @@ class DankSucc:
             if img_req.status_code == requests.codes.ok:
                 with iopen("danks/"+d.filename, 'wb') as f:
                     f.write(img_req.content)
+
+    # Create a Dank and pull the image
+    def __grab_dank(self, dank, sr):
+        d = Dank(dank.url, dank.ups, self.reddit.subreddit(sr))
+        self.danks.append(d)
 
     # Return the list of currently held Danks
     def grab_danks(self):
