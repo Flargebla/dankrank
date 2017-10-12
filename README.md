@@ -2,6 +2,8 @@
 
 ## Configuration
 
+DankRank requires a new directory `danks` to be added to the root directory of the project. This is where all the images will be stored.
+
 DankRank requires a file named `creds.json` to specify various connection credentials. The available keys and their required attributes are listed below:
 
 ### `reddit`
