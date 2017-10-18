@@ -69,7 +69,6 @@ class DankSucc:
     def kill_dank(self, dank):
         self.logger.info("Killing a dank: "+dank.url)
         self.danks.remove(dank)
-        os.remove("danks/"+dank.filename)
 
     # Calculate post scores
     def calculate_scores(self):
