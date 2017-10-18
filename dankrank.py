@@ -73,27 +73,35 @@ def cnn_model_fn(features, labels, mode):
 
     return tf.estimator.EstimatorSpec(mode=mode,
                                       loss=loss)
+def main(unused_argv):
+    # Define the memes
+    train_data = np.array([np.array(Image.open("danks/"+d.filename)) for d in succr.grab_danks() if "." in d.filename])
+    train_labels = np.array([d.score for d in succr.grab_danks()])
 
-# Define the memes
-train_data = [np.array(Image.open("danks/"+d.filename)) for d in succr.grab_danks() if "." in d.filename]
-train_labels = [d.score for d in succr.grab_danks()][:-1]
+    if len(train_data) > len(train_labels):
+        while len(train_data) != len(train_labels):
+            train_data = train_data[:-1]
+    elif len(train_labels) > len(train_data):
+        while len(train_labels) != len(train_data):
+            train_labels = train_labels[:-1]
+    
+    # Create the Estimator
+    mnist_classifier = tf.estimator.Estimator(
+        model_fn=cnn_model_fn, model_dir="model/mnist_convnet_model")
+
+
+    # Train the model
+    train_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x={"x": train_data},
+        y=train_labels,
+        batch_size=100,
+        num_epochs=None,
+        shuffle=True)
+
+    mnist_classifier.train(
+        input_fn=train_input_fn,
+        steps=20000)
 
 # Start it
-#tf.app.run()
-
-# Create the Estimator
-#mnist_classifier = tf.estimator.Estimator(
-#    model_fn=cnn_model_fn, model_dir="model/mnist_convnet_model")
-
-
-# Train the model
-#train_input_fn = tf.estimator.inputs.numpy_input_fn(
-#    x={"x": train_data},
-#    y=train_labels,
-#    batch_size=100,
-#    num_epochs=None,
-#    shuffle=True)
-#mnist_classifier.train(
-#    input_fn=train_input_fn,
-#    steps=20000,
-#    hooks=[logging_hook])
+if __name__ == "__main__":
+    tf.app.run()
