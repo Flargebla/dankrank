@@ -1,20 +1,71 @@
+<!-- https://i.imgur.com/6jajrsc.png -->
+
 <html>
     <head>
+        <link href="https://fonts.googleapis.com/css?family=Bubblegum+Sans" rel="stylesheet">
         <title>DankRank</title>
         <link   rel="stylesheet"
                 href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
                 integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
                 crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
                 integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
                 crossorigin="anonymous"></script>
+        <style>
+            *{
+                cursor: url(https://i.imgur.com/r3rB2zN.png), auto;
+                font-family: 'Bubblegum Sans';
+            }
+            body{
+                background-image: url("https://pbs.twimg.com/media/CKopdyGUMAA5WOu.jpg");
+            }
+        </style>
     </head>
-    <body>
-        <h1>Submit a dank to get a rank</h1>
-        <form method="post" enctype="multipart/form-data" action="process_dank">
-            <input type="file" name="dank" accept="image/*">
-            <input type="submit">
-            <p>"whisper down the lane"</p>
-        </form>
+    <body id="rob">
+        <div class="container">
+            <h1 class="text-center" style="font-size: 72px; color: white;">Submit a dank to get a rank</h1>
+            <form method="post" enctype="multipart/form-data" action="process_dank" class="form-group">
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3">
+                        <label onclick="PlaySound('robbie')" class="btn btn-primary btn-lg" style="box-shadow: 5px 5px 2px #666666; background-color: darkmagenta">
+                            Browse&hellip; <input type="file" name="dank" accept="image/*" style="display: none;" >
+                        </label>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="btn btn-primary btn-lg" style="box-shadow: 5px 5px 2px #666666; background-color:darkmagenta;">
+                            Submit<input type="submit" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
     </body>
+    <script>
+            var robbieCLock = setInterval(robbieSwap, 500);
+            var nips = 1;
+
+            function robbieSwap(){
+                if(nips == 1){
+                    //document.getElementById("rob").style.cursor = 'url(https://i.imgur.com/r3rB2zN.png), auto';
+                    $('*').css('cursor','url(https://i.imgur.com/r3rB2zN.png), auto');
+                    $('body').css('cursor','url(https://i.imgur.com/r3rB2zN.png), auto');
+                    nips = 0;
+                }
+                else{
+                    //document.getElementById("rob").style.cursor = 'url(https://i.imgur.com/6vQkBib.png), auto';
+                    $('*').css('cursor','url(https://i.imgur.com/6vQkBib.png), auto');
+                    $('body').css('cursor','url(https://i.imgur.com/6vQkBib.png), auto');
+                    nips = 1;
+                }
+            }
+        </script>
+        <script>
+            function PlaySound(melody) {
+                var path = "/static/sounds/"
+                var snd = new Audio(path + melody + ".mp3");
+                snd.play();
+            }
+        </script>
 </html>
