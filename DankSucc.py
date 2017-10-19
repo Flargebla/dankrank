@@ -89,7 +89,7 @@ class DankSucc:
 
     # Validate a Dank
     def __is_valid_dank(self, dank):
-        valid_types = ["jpg","png","gif","svg"]
+        valid_types = ["jpg","gifv", "png","gif","svg"]
         filename = (urllib.parse.urlsplit(dank.url)[2].split('/')[-1])
         extension = filename.split(".")[-1].lower()
         if extension in filename:
