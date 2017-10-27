@@ -26,7 +26,7 @@ print("Number of danks(post):",str(len(succr.grab_danks())))
 
 # Feed memes into the CNN
 def cnn_model_fn(features, labels, mode):
-    i_layer = tf.reshape(features["x"], [-1,64,64,3])
+    i_layer = tf.reshape(features["x"], [-1,64,64,4])
     conv1 = tf.layers.conv2d(inputs=i_layer,
                              filters=32,
                              kernel_size=[5,5],
@@ -75,8 +75,15 @@ def cnn_model_fn(features, labels, mode):
                                       loss=loss)
 def main(unused_argv):
     # Define the memes
-    train_data = np.array([np.array(Image.open("danks/"+d.filename)) for d in succr.grab_danks() if "." in d.filename])
+    train_data = np.array([])
+    for d in succr.grab_danks():
+        if "." in d.filename:
+            img_arr = np.array(Image.open("danks/"+d.filename))
+            train_data = np.append(train_data, img_arr)
+    #train_data = np.array([np.array(Image.open("danks/"+d.filename)) for d in succr.grab_danks() if "." in d.filename])
     train_labels = np.array([d.score for d in succr.grab_danks()])
+
+    print("Data shape:"+str(train_data.shape))
 
     if len(train_data) > len(train_labels):
         while len(train_data) != len(train_labels):
