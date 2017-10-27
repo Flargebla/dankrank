@@ -14,3 +14,4 @@ def process_dank():
     time.sleep(2)
     return "<img src='static/images/{}'>".format(image.filename)
 
+# test
